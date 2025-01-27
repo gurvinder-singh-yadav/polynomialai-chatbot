@@ -34,3 +34,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 __pycache__
+
+# local env files
+.env
+!env/.env.template
+.venv
+env/*
+!env/.env.template
+venv/
+ENV/*
+!ENV/.env.template
+env.bak/
+venv.bak/
