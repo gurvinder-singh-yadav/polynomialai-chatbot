@@ -6,6 +6,15 @@
 
 This document outlines the architecture and features of a knowledge-based conversational AI system. The system utilizes a combination of technologies for efficient knowledge management, query handling, and user interaction.
 
+## Demonstration Video
+
+Here is a demonstration video of the conversational AI system in action:
+```html
+<div align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3Mzf3pFW0qQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+```
+
 ## Knowledge Base Integration:
 
 **Pre-loading:**
@@ -91,15 +100,3 @@ npm i
 pip install -r requirements.txt
 npm run dev
 ```
-
-
-<div align="center">
-  <iframe 
-    width="700" 
-    height="400" 
-    src="https://www.youtube.com/embed/tofv0TZZtDA" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
-</div>
