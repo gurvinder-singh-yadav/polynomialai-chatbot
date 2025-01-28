@@ -10,9 +10,7 @@ This document outlines the architecture and features of a knowledge-based conver
 
 Here is a demonstration video of the conversational AI system in action:
 
-<div align="center">
-<iframe width="560" height="315" src="https://www.youtube.com/embed/3Mzf3pFW0qQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</div>
+[![Video Title](https://img.youtube.com/vi/3Mzf3pFW0qQ/0.jpg)](https://www.youtube.com/watch?v=3Mzf3pFW0qQ)
 
 
 ## Knowledge Base Integration:
