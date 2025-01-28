@@ -1,78 +1,90 @@
-<p align="center">
-  <a href="https://nextjs-flask-starter.vercel.app/">
-    <img src="https://assets.vercel.com/image/upload/v1588805858/repositories/vercel/logo.png" height="96">
-    <h3 align="center">Next.js Flask Starter</h3>
-  </a>
-</p>
+# Knowledge-Based Conversational AI System
 
-<p align="center">Simple Next.js boilerplate that uses <a href="https://flask.palletsprojects.com/">Flask</a> as the API backend.</p>
+This document outlines the architecture and features of a knowledge-based conversational AI system. The system utilizes a combination of technologies for efficient knowledge management, query handling, and user interaction.
 
-<br/>
+## Knowledge Base Integration:
 
-## Introduction
+**Pre-loading:**
+*   The system is pre-loaded with a structured knowledge base stored as JSON files within a local directory named `knowledge-base`.
+*   These JSON files contain question-answer (Q&A) pairs, which are the fundamental units of knowledge for the system.
+*   **Data Format:** Each JSON file contains a list of `qa_pairs` where each `qa_pair` has a "question" and "answers" field.
+    ```json
+       {
+            "qa_pairs": [
+                {
+                    "question": "the 1999 film '10 things i hate about you' is based on which shakespeare play",
+                    "answers": ["taming of the shrew"]
+                },
+                {
+                   "question": "who began as a broadway actor, made his hollywood debut in 1935, and had lead roles in the grapes of wrath, the ox-bow incident, mister roberts and 12 angry men",
+                   "answers": ["henry fonda"]
+                }
+            ]
+        }
 
-This is a hybrid Next.js + Python app that uses Next.js as the frontend and Flask as the API backend. One great use case of this is to write Next.js apps that use Python AI libraries on the backend.
+    ```
 
-## How It Works
+*   **Chunking:** Upon loading, the Q&A data is chunked to optimize the system's performance and resource utilization, particularly due to limited credits in the Google Gemini Studio. The chunking strategy ensures each chunk contains at least 10 Q&A entities (pairs).
 
-The Python/Flask server is mapped into to Next.js app under `/api/`.
+*   **Embedding:** Embeddings are generated for each chunk using the Google Gemini `model-004` embedding model.
+*   **Storage:** The generated chunk embeddings, along with the original text are stored in MongoDB as a vector store. This facilitates efficient similarity-based retrieval of relevant context for user queries.
 
-This is implemented using [`next.config.js` rewrites](https://github.com/vercel/examples/blob/main/python/nextjs-flask/next.config.js) to map any request to `/api/:path*` to the Flask API, which is hosted in the `/api` folder.
+*   **Periodic Updates:** The knowledge base is designed to accommodate periodic updates. New files added to the `knowledge-base` folder will be processed, chunked, and added to the database, also if any changes are made to the existing files it also updates the database based on the new content in the file and removes any obsolete data from the database which are no longer present in the `knowledge-base` folder.
 
-On localhost, the rewrite will be made to the `127.0.0.1:5328` port, which is where the Flask server is running.
+## Dynamic Query Handling:
 
-In production, the Flask server is hosted as [Python serverless functions](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python) on Vercel.
+*   **LLM Utilization:** The system uses Google's Gemini 1.5 Flash model for processing user queries and generating responses. This model is selected for its balance between speed and performance for conversational AI tasks.
+*   **Contextual Processing:**
+    *   User queries are first processed by the embedding model (`model-004`) to generate embeddings.
+    *   These embeddings are used to perform similarity searches in the MongoDB vector store.
+    *   The most relevant context chunks are then retrieved and included in the prompt passed to Gemini 1.5 Flash to generate the response.
+*   **Prompt Engineering:** The prompt sent to the LLM include the retrieved context and the user query to ensure the response is grounded in the available knowledge base.
 
-## Demo
+## Flask Application Features:
 
-https://nextjs-flask-starter.vercel.app/
+**Frontend:**
+*   **Technology:** The frontend is built using Next.js. This allows for efficient server-side rendering and a modern user experience.
+*   **Features:** The frontend provides a simple user interface with:
+    *   A text input box where users can enter their queries.
+    *   A display area to show the system’s responses.
+*   **API Endpoint:**
+    *   **Technology:** The API backend is built using FastAPI. This choice enables asynchronous operation and is particularly suited for handling large language model tasks.
+    *   **Endpoint:** A `/agent` GET endpoint that accepts user queries via a query parameter `msg`.
 
-## Deploy Your Own
+*   **Admin Features:**
+    * **Technology:**  The admin section is integrated directly into the Next.js frontend and communicates with the FastAPI backend.
+    *   **Knowledge Base Updates:**
+        *   Provides functionality to initiate an update of the knowledge base.
+        *   It can detect added, deleted or modified knowledge base content and update the MongoDB vector store accordingly.
+    *   **Conversation Logging:**
+        *   Displays all the conversation logs stored in the mongo db database.
+        *  Accessible via the `/admin` endpoint.
+        *  Allows filtering conversations by user id, which is unique for every conversation.
 
-You can clone & deploy it to Vercel with one click:
+## Interaction Logging:
+*   **Storage:** All user queries and the system's corresponding responses are stored in MongoDB.
+*   **Logging Details:**
+    *   Each user interaction is logged with a unique user ID which is generated at the start of each conversation.
+    *   Both the user's question and the LLM's response are logged in the database.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?demo-title=Next.js%20Flask%20Starter&demo-description=Simple%20Next.js%20boilerplate%20that%20uses%20Flask%20as%20the%20API%20backend.&demo-url=https%3A%2F%2Fnextjs-flask-starter.vercel.app%2F&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F795TzKM3irWu6KBCUPpPz%2F44e0c6622097b1eea9b48f732bf75d08%2FCleanShot_2023-05-23_at_12.02.15.png&project-name=Next.js%20Flask%20Starter&repository-name=nextjs-flask-starter&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fnextjs-flask&from=vercel-examples-repo)
+## Fallback Mechanism:
 
-## Developing Locally
+*   **Context Absence:** If the Gemini 1.5 Flash model cannot generate an answer based on the retrieved context, it provides a polite fallback response.
+*   **Fallback Response:** The fallback response states that the system does not have sufficient context to provide an answer, ensuring transparency and a good user experience.
+*   **No Generated Content:** The LLM is restricted to only answer based on the given context, and it cannot provide any output if it does not have sufficient context from the knowledge base.
 
-You can clone & create this repo with the following command
+## Technology Comparison:
+
+*   **Template LLM:** The template suggests using OpenAI’s GPT models, while this implementation uses Google's Gemini 1.5 Flash for the conversational model and `model-004` for embedding. This was chosen to take advantage of Google's latest generative AI offerings.
+*   **Template Frontend (Optional):** The template mentions using a simple web interface via Flask, but the system uses Next.js for better performance, server-side rendering, and a more robust frontend architecture.
+* **Template Backend:** The template mentions using Flask for the API but, this implementation uses FastAPI. The choice was done to better align with the asynchronous operations of LLMs, and to provide efficient API handling.
+
+## Running the Project Locally
+
+To run the project locally, execute the following commands in your terminal:
 
 ```bash
-npx create-next-app nextjs-flask --example "https://github.com/vercel/examples/tree/main/python/nextjs-flask"
-```
-
-## Getting Started
-
-First, install the dependencies:
-
-```bash
-npm install
-# or
-yarn
-# or
-pnpm install
-```
-
-Then, run the development server:
-
-```bash
+docker-compose up -d
+npm i
+pip install -r requirements.txt
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-The Flask server will be running on [http://127.0.0.1:5328](http://127.0.0.1:5328) – feel free to change the port in `package.json` (you'll also need to update it in `next.config.js`).
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Flask Documentation](https://flask.palletsprojects.com/en/1.1.x/) - learn about Flask features and API.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
