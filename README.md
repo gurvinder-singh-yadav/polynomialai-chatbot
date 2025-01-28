@@ -1,3 +1,7 @@
+## chat bot application with active knowledge base
+
+
+
 # Knowledge-Based Conversational AI System
 
 This document outlines the architecture and features of a knowledge-based conversational AI system. The system utilizes a combination of technologies for efficient knowledge management, query handling, and user interaction.
@@ -79,12 +83,23 @@ This document outlines the architecture and features of a knowledge-based conver
 *   **Template Frontend (Optional):** The template mentions using a simple web interface via Flask, but the system uses Next.js for better performance, server-side rendering, and a more robust frontend architecture.
 * **Template Backend:** The template mentions using Flask for the API but, this implementation uses FastAPI. The choice was done to better align with the asynchronous operations of LLMs, and to provide efficient API handling.
 
-## Running the Project Locally
-
-To run the project locally, execute the following commands in your terminal:
+This markdown provides a detailed description of the system. This setup ensures you have an efficient, knowledge-based conversational bot that is capable of answering user questions based on the pre-loaded knowledge base, and also logging all the conversation and providing an admin panel to see all the conversations and update the knowledge base as well.
 
 ```bash
 docker-compose up -d
 npm i
 pip install -r requirements.txt
 npm run dev
+```
+
+
+<div align="center">
+  <iframe 
+    width="700" 
+    height="400" 
+    src="https://www.youtube.com/embed/tofv0TZZtDA" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
